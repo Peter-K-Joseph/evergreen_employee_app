@@ -45,4 +45,8 @@ class DatabaseStore {
     var res = db.insert('session', user.toJson());
     return res;
   }
+
+  static void logout() {
+    DatabaseStore().deleteSession();
+  }
 }

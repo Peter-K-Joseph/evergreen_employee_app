@@ -1,7 +1,11 @@
 import 'package:evergreen_employee_app/controller/dashboard_controller.dart';
+import 'package:evergreen_employee_app/mischelaneous/database.dart';
 import 'package:evergreen_employee_app/model/bottom_naviation_model.dart';
+import 'package:evergreen_employee_app/view/admin_controls.dart';
 import 'package:evergreen_employee_app/view/attendance.dart';
 import 'package:evergreen_employee_app/view/home.dart';
+import 'package:evergreen_employee_app/view/login.dart';
+import 'package:evergreen_employee_app/view/people.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -65,9 +69,32 @@ class Dashboard extends StatelessWidget {
               width: 10,
             ),
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text("Logout"),
+                    content: const Text("Are you sure you want to logout?"),
+                    actions: [
+                      TextButton(
+                          onPressed: () {
+                            DatabaseStore.logout();
+                            Get.off(
+                              () => LoginPage(),
+                            );
+                          },
+                          child: const Text("Yes")),
+                      TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text("No")),
+                    ],
+                  ),
+                );
+              },
               icon: Icon(
-                Icons.settings,
+                Icons.logout_outlined,
                 color: Get.find<DashboardController>().iconColor.value,
               ),
             )
@@ -123,13 +150,13 @@ class Dashboard extends StatelessWidget {
               Attendance(
                 parentController: Get.find<DashboardController>(),
               ),
-              Home(
+              ContactDirectory(
                 parentController: Get.find<DashboardController>(),
               ),
               Home(
                 parentController: Get.find<DashboardController>(),
               ),
-              Home(
+              AdminControls(
                 parentController: Get.find<DashboardController>(),
               ),
             ],

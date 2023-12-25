@@ -7,6 +7,7 @@ import 'package:evergreen_employee_app/view/current_attendance.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:syncfusion_flutter_maps/maps.dart';
 
@@ -18,7 +19,43 @@ class AttendanceController extends GetxController {
     0.0,
   ].obs;
   Position? pos;
+  String? locationString = null;
   RxString location = 'We are getting your location details...'.obs;
+
+  loadingGPSAnimation() {
+    showDialog(
+      context: Get.context!,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.transparent,
+        content: SizedBox(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          child: Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Lottie.asset('assets/gps.json'),
+                const SizedBox(
+                  height: 10,
+                ),
+                const Text(
+                  "Please wait while we get your location",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    backgroundColor: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Rx<Widget> attendanceStatus = const Column(
     children: [
       SizedBox(
@@ -77,15 +114,19 @@ class AttendanceController extends GetxController {
               const Spacer(),
               ElevatedButton(
                 onPressed: () async {
-                  if (pos == null) {
+                  loadingGPSAnimation();
+                  bool loc = await getCurrentPosition();
+                  if (!loc || locationString == null || pos == null) {
                     ScaffoldMessenger.of(Get.context!).showSnackBar(
                       const SnackBar(
-                        content: Text('Please wait while we get your location'),
+                        content:
+                            Text('Location fetching failed due to an error'),
                       ),
                     );
                     return;
                   }
-                  handlers.enableAttendance(pos!, location.value);
+                  Get.back();
+                  handlers.enableAttendance(pos!, locationString!);
                 },
                 child: const Text("New Check In"),
               ),
@@ -119,16 +160,18 @@ class AttendanceController extends GetxController {
           ),
           OutlinedButton(
             onPressed: () async {
-              await getCurrentPosition();
-              if (pos == null) {
+              loadingGPSAnimation();
+              bool loc = await getCurrentPosition();
+              Get.back();
+              if (pos == null || !loc || locationString == null) {
                 ScaffoldMessenger.of(Get.context!).showSnackBar(
                   const SnackBar(
-                    content: Text('Please wait while we get your location'),
+                    content: Text('GPS Positioning Failed'),
                   ),
                 );
                 return;
               }
-              handlers.enableAttendance(pos!, location.value);
+              handlers.enableAttendance(pos!, locationString!);
             },
             style: OutlinedButton.styleFrom(
               side: const BorderSide(
@@ -172,8 +215,10 @@ class AttendanceController extends GetxController {
             children: [
               ElevatedButton(
                 onPressed: () async {
-                  await getCurrentPosition();
-                  if (pos == null) {
+                  loadingGPSAnimation();
+                  bool loc = await getCurrentPosition();
+                  Get.back();
+                  if (pos == null || !loc || locationString == null) {
                     ScaffoldMessenger.of(Get.context!).showSnackBar(
                       const SnackBar(
                         content: Text('Please wait while we get your location'),
@@ -183,7 +228,7 @@ class AttendanceController extends GetxController {
                   }
                   handlers.endAttendance(
                     pos!,
-                    location.value,
+                    locationString!,
                   );
                 },
                 child: const Text("Checkout Session"),
@@ -248,11 +293,11 @@ class AttendanceController extends GetxController {
     return true;
   }
 
-  updateLocationString(double lat, double long) async {
+  Future<bool> updateLocationString(double lat, double long) async {
     try {
       location.value = 'We are getting your location details...';
       var data = await HttpRequests().getLocationString(lat, long);
-      location.value = json.decode(data.body)['display_name'];
+      location.value = locationString = json.decode(data.body)['display_name'];
     } catch (e) {
       ScaffoldMessenger.of(Get.context!).showSnackBar(
         const SnackBar(
@@ -261,41 +306,40 @@ class AttendanceController extends GetxController {
           ),
         ),
       );
-      location.value = '$lat, $long';
+      location.value = locationString = '$lat, $long';
     }
+    return true;
   }
 
   Future<bool> getCurrentPosition() async {
     final hasPermission = await _handleLocationPermission();
     if (!hasPermission) return false;
     location.value = 'We are getting your location details...';
-    await Geolocator.getCurrentPosition(
-            desiredAccuracy: LocationAccuracy.medium)
-        .then((Position position) async {
-      currentLocation.value = [position.latitude, position.longitude];
-      try {
-        if (pos == position) return true;
-        mapTileLayerController.pixelToLatLng(
-          Offset(
-            Get.width / 2,
-            Get.height / 2,
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.medium);
+
+    currentLocation.value = [position.latitude, position.longitude];
+    try {
+      if (pos == position) false;
+      mapTileLayerController.pixelToLatLng(
+        Offset(
+          Get.width / 2,
+          Get.height / 2,
+        ),
+      );
+      mapTileLayerController.insertMarker(0);
+      pos = position;
+    } catch (e) {
+      ScaffoldMessenger.of(Get.context!).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Unknown error occurred',
           ),
-        );
-        mapTileLayerController.insertMarker(0);
-        pos = position;
-      } catch (e) {
-        ScaffoldMessenger.of(Get.context!).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Unknown error occurred',
-            ),
-          ),
-        );
-      }
-      await updateLocationString(position.latitude, position.longitude);
-      return position;
-    });
-    return true;
+        ),
+      );
+      return false;
+    }
+    return updateLocationString(position.latitude, position.longitude);
   }
 
   Timer? timer;
@@ -551,6 +595,7 @@ class AttendanceHandlers {
                   await HttpRequests()
                       .endAttendance(pos, location)
                       .then((value) {
+                    print(value.body);
                     if (value.statusCode == 200) {
                       Get.back();
                       Get.find<AttendanceController>().onInit();

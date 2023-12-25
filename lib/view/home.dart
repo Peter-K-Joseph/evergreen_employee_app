@@ -1,10 +1,13 @@
+import 'dart:math';
+
 import 'package:evergreen_employee_app/controller/dashboard_controller.dart';
 import 'package:evergreen_employee_app/controller/home_controller.dart';
+import 'package:evergreen_employee_app/mischelaneous/overlays.dart';
+import 'package:evergreen_employee_app/view/attendance.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class Home extends StatelessWidget {
-  final HomeController _controller = Get.put(HomeController(), permanent: true);
   final DashboardController parentController;
   Home({Key? key, required this.parentController}) : super(key: key);
 
@@ -41,7 +44,7 @@ class Home extends StatelessWidget {
                         children: [
                           Obx(
                             () => Text(
-                              '${_controller.greetings.value},',
+                              '${Get.find<HomeController>().greetings.value},',
                               style: const TextStyle(
                                 fontSize: 20,
                                 color: Colors.white,
@@ -50,7 +53,7 @@ class Home extends StatelessWidget {
                           ),
                           Obx(
                             () => Text(
-                              _controller.name.value,
+                              Get.find<HomeController>().name.value,
                               textAlign: TextAlign.left,
                               style: const TextStyle(
                                 fontSize: 30,
@@ -63,14 +66,30 @@ class Home extends StatelessWidget {
                       ),
                       Obx(
                         () => Container(
-                          width: 70,
-                          height: 70,
+                          height: 65.0,
+                          width: 65.0,
                           decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                              image: NetworkImage(_controller.imageURL.value),
-                              fit: BoxFit.cover,
-                            ),
+                            borderRadius: BorderRadius.circular(50),
+                            color: randomColorGenerator(),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(50),
+                            child: Get.find<HomeController>().imageURL.value !=
+                                    ''
+                                ? Image.network(
+                                    Get.find<HomeController>().imageURL.value,
+                                    fit: BoxFit.contain,
+                                  )
+                                : Center(
+                                    child: Text(
+                                      Get.find<HomeController>().name.value[0],
+                                      style: const TextStyle(
+                                        fontSize: 40,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
                           ),
                         ),
                       )
@@ -106,7 +125,19 @@ class Home extends StatelessWidget {
                             fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Get.to(
+                            () => Scaffold(
+                              appBar: AppBar(
+                                title: const Text("Manage Attendance"),
+                              ),
+                              body: Attendance(
+                                parentController: parentController,
+                                addPadding: false,
+                              ),
+                            ),
+                          );
+                        },
                         icon: const Icon(Icons.view_agenda_outlined),
                       )
                     ],
@@ -115,46 +146,9 @@ class Home extends StatelessWidget {
                 const SizedBox(
                   height: 10,
                 ),
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: const Color(0xff3A405A),
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: const Row(
-                    children: [
-                      Icon(
-                        Icons.calendar_today_outlined,
-                        color: Colors.white,
-                      ),
-                      SizedBox(
-                        width: 15,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Project Hour - Phase 1",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          Text(
-                            "01:00 PM - 2:00 PM | Class 312",
-                            style: TextStyle(
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
+                Obx(
+                  () => Get.find<HomeController>().currentAttendance.value,
+                )
               ],
             ),
           ),
@@ -185,12 +179,20 @@ class Home extends StatelessWidget {
                       IconButton(
                         onPressed: () {},
                         icon: const Icon(Icons.assignment_outlined),
-                      )
+                      ),
                     ],
                   ),
                 ),
+                const SizedBox(
+                  height: 10,
+                ),
                 const Column(
-                  children: [],
+                  children: [
+                    Text(
+                      "We aren't here yet... \nSalary Payments will be available on a later release",
+                      textAlign: TextAlign.center,
+                    )
+                  ],
                 ),
               ],
             ),

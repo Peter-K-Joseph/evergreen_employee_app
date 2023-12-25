@@ -4,7 +4,9 @@ import 'package:evergreen_employee_app/mischelaneous/database.dart';
 import 'package:evergreen_employee_app/model/http_requests_model.dart';
 import 'package:evergreen_employee_app/model/login.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 String token = '';
 
@@ -75,36 +77,10 @@ class HttpRequests {
           name: temp['name'],
           token: json.decode(res.body)["access_token"],
           isSigninedIn: true,
+          photoUrl: temp['photoURL'],
         ),
       );
       token = json.decode(res.body)["access_token"];
-    }
-    return HTTPResponseBody.import(res);
-  }
-
-  Future<HTTPResponseBody> signup({
-    required String email,
-    required String password,
-    required String name,
-    required String employeeId,
-  }) async {
-    http.Response res = await http.post(
-      Uri.parse('${Constants().backendUrl}/auth/signup'),
-      body: {
-        'email': email,
-        'password': password,
-        'name': name,
-        'student_id': employeeId,
-      },
-    );
-    if (res.statusCode == 200) {
-      DatabaseStore().addEmployeeData(
-        UserModel(
-          email: email,
-          name: name,
-          employeeId: employeeId,
-        ),
-      );
     }
     return HTTPResponseBody.import(res);
   }
@@ -233,6 +209,46 @@ class HttpRequests {
     }
     http.Response res = await http.get(
       Uri.parse(url),
+      headers: headers,
+    );
+    return HTTPResponseBody.import(res);
+  }
+
+  Future<HTTPResponseBody> getMonthWiseData({required String month}) async {
+    // convert March 2023 to Datetime for what comes in month var
+    // get the employee id from the database
+    // get the data from the backend
+    var employeeId = await DatabaseStore().getEmployee();
+    DateTime date = DateFormat('MMMM, yyyy').parse(month);
+    DateTime endOfMonth = DateTime(date.year, date.month + 1, 0);
+    endOfMonth = endOfMonth.subtract(const Duration(days: 1));
+    http.Response res = await http.get(
+      Uri.parse(
+          '${Constants().backendUrl}/api/attendance/${employeeId[0]['employee_id']}/${date.toIso8601String()}/${endOfMonth.toIso8601String()}'),
+      headers: headers,
+    );
+    return HTTPResponseBody.import(res);
+  }
+
+  Future<HTTPResponseBody> getPeople(String department) async {
+    http.Response res = await http.get(
+      Uri.parse('${Constants().backendUrl}/apis/network/$department/members'),
+      headers: headers,
+    );
+    return HTTPResponseBody.import(res);
+  }
+
+  Future<HTTPResponseBody> getEmployeeDetails(String memberID) async {
+    http.Response res = await http.get(
+      Uri.parse('${Constants().backendUrl}/apis/network/$memberID'),
+      headers: headers,
+    );
+    return HTTPResponseBody.import(res);
+  }
+
+  Future<HTTPResponseBody> getUsers() async {
+    http.Response res = await http.get(
+      Uri.parse('${Constants().backendUrl}/apis/employee'),
       headers: headers,
     );
     return HTTPResponseBody.import(res);

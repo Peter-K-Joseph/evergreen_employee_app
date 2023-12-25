@@ -1,5 +1,6 @@
 import 'package:evergreen_employee_app/mischelaneous/http_requests.dart';
 import 'package:evergreen_employee_app/model/http_requests_model.dart';
+import 'package:evergreen_employee_app/view/alert_notify.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_maps/maps.dart';
@@ -50,6 +51,9 @@ class CurrentAttendance extends StatelessWidget {
                   });
                   return Column(
                     children: [
+                      const AlertNotifier(
+                          type: "success",
+                          text: "Attendance Record is completed"),
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -373,6 +377,8 @@ class CurrentAttendance extends StatelessWidget {
                 } else if (body['state'] == "absent") {
                   return Column(
                     children: [
+                      const AlertNotifier(
+                          type: "error", text: "Attendance is absent"),
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -436,6 +442,30 @@ class CurrentAttendance extends StatelessWidget {
                   });
                   return Column(
                     children: [
+                      const AlertNotifier(
+                        type: "warning",
+                        text:
+                            "Session is still running. This will not be counted as attendance till it ends.",
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      if (DateTime.parse(
+                            body['records']['timestamp_start'],
+                          ).day !=
+                          DateTime.now().day)
+                        const AlertNotifier(
+                          type: "error",
+                          text:
+                              "System mismatch detected! Contact your IT Adminstrator to end this session",
+                        ),
+                      if (DateTime.parse(
+                            body['records']['timestamp_start'],
+                          ).day !=
+                          DateTime.now().day)
+                        const SizedBox(
+                          height: 15,
+                        ),
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -591,11 +621,170 @@ class CurrentAttendance extends StatelessWidget {
                           ],
                         ),
                       ),
+                      const SizedBox(
+                        height: 20,
+                      ),
                     ],
                   );
                 } else {
                   return Column(
-                    children: [],
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 10,
+                              offset: Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                        padding: const EdgeInsets.all(10),
+                        width: MediaQuery.of(context).size.width - 40,
+                        child: const Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              height: 15,
+                            ),
+                            Icon(
+                              Icons.error_outline_rounded,
+                              color: Color(0xffE5625E),
+                              size: 150,
+                            ),
+                            SizedBox(
+                              height: 15,
+                            ),
+                            Text(
+                              "Attendance record corrupted or not found.",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Text(
+                              "Contact your IT Support Engineer.",
+                              style: TextStyle(
+                                fontSize: 16,
+                              ),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Container(
+                        height: 1,
+                        width: MediaQuery.of(context).size.width - 40,
+                        color: Colors.grey.shade300,
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 10,
+                              offset: Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        margin: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                        padding: const EdgeInsets.all(10),
+                        width: MediaQuery.of(context).size.width - 40,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "Debug Log",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                const Text(
+                                  "Attendance ID",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  attendanceID.toString(),
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                const Text(
+                                  "Server Response",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  (snapshot.data as HTTPResponseBody)
+                                      .statusCode
+                                      .toString(),
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: ((snapshot.data as HTTPResponseBody)
+                                                .statusCode ==
+                                            200)
+                                        ? Colors.green
+                                        : Colors.red,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                const Text(
+                                  "Response Data",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  body.toString(),
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
                   );
                 }
               } else {

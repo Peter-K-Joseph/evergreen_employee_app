@@ -7,8 +7,11 @@ import 'package:get/get.dart';
 
 class Attendance extends StatelessWidget {
   final DashboardController parentController;
+  final bool addPadding;
 
-  Attendance({Key? key, required this.parentController}) : super(key: key);
+  const Attendance(
+      {Key? key, required this.parentController, this.addPadding = true})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,9 +25,10 @@ class Attendance extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              const SizedBox(
-                height: 130,
-              ),
+              if (addPadding)
+                const SizedBox(
+                  height: 130,
+                ),
               Container(
                 width: MediaQuery.of(context).size.width - 40,
                 decoration: BoxDecoration(
@@ -112,6 +116,7 @@ class Attendance extends StatelessWidget {
                                             Get.find<AttendanceController>()
                                                 .currentLocation[1]),
                                       ),
+                                      key: GlobalKey(),
                                       controller:
                                           Get.find<AttendanceController>()
                                               .mapTileLayerController,
