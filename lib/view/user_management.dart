@@ -2,8 +2,6 @@ import 'package:evergreen_employee_app/mischelaneous/http_requests.dart';
 import 'package:evergreen_employee_app/mischelaneous/overlays.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_navigation/get_navigation.dart';
-import 'package:image_picker/image_picker.dart';
 
 class UserManagement extends StatelessWidget {
   const UserManagement({super.key});
@@ -101,6 +99,26 @@ class UserManagement extends StatelessWidget {
 class NewUserCreation extends StatelessWidget {
   const NewUserCreation({super.key});
 
+  InputDecoration decorationReturner(String hint, String label, IconData icon) {
+    return InputDecoration(
+      hintText: hint,
+      labelText: label,
+      floatingLabelStyle: TextStyle(color: Colors.grey.shade800),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8.0),
+        borderSide: BorderSide(
+          color: Colors.grey.shade500,
+          width: 1.5,
+        ),
+      ),
+      prefixIcon: Icon(icon),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8.0),
+        borderSide: BorderSide(color: Colors.grey.shade300),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -137,60 +155,52 @@ class NewUserCreation extends StatelessWidget {
                   ),
                 ),
                 TextFormField(
-                  decoration: InputDecoration(
-                    hintText: "Peter K Joseph",
-                    labelText: "Name",
-                    floatingLabelStyle: TextStyle(color: Colors.grey.shade800),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide(
-                        color: Colors.grey.shade500,
-                        width: 1.5,
-                      ),
-                    ),
-                    prefixIcon: const Icon(Icons.person_2),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
-                    ),
+                  decoration: decorationReturner(
+                    'Peter K Joseph',
+                    'Name',
+                    Icons.person_outline_rounded,
                   ),
                   keyboardType: TextInputType.name,
                   autocorrect: false,
                 ),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                  ),
+                const SizedBox(
+                  height: 20,
                 ),
                 TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Phone',
+                  decoration: decorationReturner(
+                    'peter@evergreenpv.com',
+                    'Email',
+                    Icons.email_outlined,
                   ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                TextFormField(
+                  decoration: decorationReturner(
+                    '9879756654',
+                    'Phone Number',
+                    Icons.contact_phone_outlined,
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
                 ),
                 TextFormField(
                   decoration: const InputDecoration(
                     labelText: 'Department',
                   ),
                 ),
+                const SizedBox(
+                  height: 20,
+                ),
                 TextFormField(
                   decoration: const InputDecoration(
                     labelText: 'Designation',
                   ),
                 ),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Address',
-                  ),
-                ),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Password',
-                  ),
-                ),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Confirm Password',
-                  ),
+                const SizedBox(
+                  height: 20,
                 ),
                 ElevatedButton(
                   onPressed: () {},

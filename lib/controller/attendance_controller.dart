@@ -9,11 +9,11 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:syncfusion_flutter_maps/maps.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 class AttendanceController extends GetxController {
   AttendanceHandlers handlers = AttendanceHandlers();
-  MapTileLayerController mapTileLayerController = MapTileLayerController();
   RxList<double> currentLocation = [
     0.0,
     0.0,
@@ -319,26 +319,18 @@ class AttendanceController extends GetxController {
         desiredAccuracy: LocationAccuracy.medium);
 
     currentLocation.value = [position.latitude, position.longitude];
-    try {
-      if (pos == position) false;
-      mapTileLayerController.pixelToLatLng(
-        Offset(
-          Get.width / 2,
-          Get.height / 2,
-        ),
-      );
-      mapTileLayerController.insertMarker(0);
-      pos = position;
-    } catch (e) {
-      ScaffoldMessenger.of(Get.context!).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Unknown error occurred',
-          ),
-        ),
-      );
-      return false;
-    }
+    // try {
+    if (pos == position) false;
+    // if (mapTileLayerController != null) {
+    //   mapTileLayerController.pixelToLatLng(
+    //     Offset(
+    //       Get.width / 2,
+    //       Get.height / 2,
+    //     ),
+    //   );
+    //   mapTileLayerController.insertMarker(0);
+    pos = position;
+    // }
     return updateLocationString(position.latitude, position.longitude);
   }
 
