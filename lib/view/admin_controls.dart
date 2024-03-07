@@ -1,8 +1,11 @@
+import 'package:evergreen_employee_app/controller/attendance_records_controller.dart';
+import 'package:evergreen_employee_app/controller/attendance_stats_controller.dart';
 import 'package:evergreen_employee_app/controller/dashboard_controller.dart';
+import 'package:evergreen_employee_app/view/attendance_records.dart';
+import 'package:evergreen_employee_app/view/attendance_stats.dart';
 import 'package:evergreen_employee_app/view/user_management.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_navigation/get_navigation.dart';
 
 class AdminControls extends StatelessWidget {
   final DashboardController parentController;
@@ -106,14 +109,14 @@ class AdminControls extends StatelessWidget {
                         child: Column(
                           children: [
                             Text(
-                              "0.00 Rs",
+                              "0",
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             Text(
-                              "Paid this month",
+                              "Present Today",
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
@@ -158,28 +161,14 @@ class AdminControls extends StatelessWidget {
               trailing: const Icon(Icons.arrow_forward_ios),
             ),
             ListTile(
-              onTap: () {},
-              title: const Text(
-                "Financial Records",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              subtitle: const Text(
-                "View and modify financial records",
-                style: TextStyle(
-                  color: Colors.black,
-                ),
-              ),
-              leading: const Icon(
-                Icons.monetization_on_outlined,
-                color: Colors.black,
-              ),
-              trailing: const Icon(Icons.arrow_forward_ios),
-            ),
-            ListTile(
-              onTap: () {},
+              onTap: () {
+                Get.to(() => const AttendanceRecords(),
+                    binding: BindingsBuilder(
+                  () {
+                    Get.put(AttendanceRecordsController());
+                  },
+                ));
+              },
               title: const Text(
                 "Attendance Records",
                 style: TextStyle(
@@ -200,7 +189,16 @@ class AdminControls extends StatelessWidget {
               trailing: const Icon(Icons.arrow_forward_ios),
             ),
             ListTile(
-              onTap: () {},
+              onTap: () {
+                Get.to(
+                  () => const AttendanceStats(),
+                  binding: BindingsBuilder(
+                    () {
+                      Get.put(AttendanceStatsController());
+                    },
+                  ),
+                );
+              },
               title: const Text(
                 "Attendance Stats",
                 style: TextStyle(

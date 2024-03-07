@@ -201,14 +201,10 @@ class HomeController extends GetxController {
         child: InkWell(
           onTap: () {
             Get.to(
-              () => Scaffold(
-                appBar: AppBar(
-                  title: const Text("Manage Attendance"),
-                ),
-                body: Attendance(
-                  parentController: Get.find<DashboardController>(),
-                  addPadding: false,
-                ),
+              () => Attendance(
+                parentController: Get.find<DashboardController>(),
+                addPadding: false,
+                getAsScaffold: true,
               ),
             );
           },

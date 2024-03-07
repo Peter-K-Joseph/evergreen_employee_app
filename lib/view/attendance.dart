@@ -1,20 +1,24 @@
 import 'package:evergreen_employee_app/controller/attendance_controller.dart';
 import 'package:evergreen_employee_app/controller/dashboard_controller.dart';
 import 'package:evergreen_employee_app/view/prev_employee_records.dart';
-import 'package:syncfusion_flutter_maps/maps.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class Attendance extends StatelessWidget {
   final DashboardController parentController;
   final bool addPadding;
+  final bool getAsScaffold;
 
-  const Attendance(
-      {Key? key, required this.parentController, this.addPadding = true})
-      : super(key: key);
+  const Attendance({
+    Key? key,
+    required this.parentController,
+    this.addPadding = true,
+    this.getAsScaffold = false,
+  }) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
+  Widget getAttendanceWidget(BuildContext context) {
     return SizedBox(
       height: MediaQuery.of(context).size.height,
       child: RefreshIndicator(
@@ -100,46 +104,21 @@ class Attendance extends StatelessWidget {
                             .getCurrentPosition(),
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
-                            return Obx(
-                              () => SfMaps(
-                                layers: [
-                                  MapTileLayer(
-                                      initialLatLngBounds: MapLatLngBounds(
-                                        MapLatLng(
-                                            Get.find<AttendanceController>()
-                                                .currentLocation[0],
-                                            Get.find<AttendanceController>()
-                                                .currentLocation[1]),
-                                        MapLatLng(
-                                            Get.find<AttendanceController>()
-                                                .currentLocation[0],
-                                            Get.find<AttendanceController>()
-                                                .currentLocation[1]),
-                                      ),
-                                      key: GlobalKey(),
-                                      controller:
-                                          Get.find<AttendanceController>()
-                                              .mapTileLayerController,
-                                      markerBuilder: (context, index) {
-                                        return MapMarker(
-                                          latitude:
-                                              Get.find<AttendanceController>()
-                                                  .currentLocation[0],
-                                          longitude:
-                                              Get.find<AttendanceController>()
-                                                  .currentLocation[1],
-                                          child: Icon(
-                                            Icons.location_on,
-                                            color: Colors.red,
-                                          ),
-                                        );
-                                      },
-                                      initialZoomLevel: 15,
-                                      initialFocalLatLng: const MapLatLng(0, 0),
-                                      urlTemplate:
-                                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png'),
-                                ],
+                            return FlutterMap(
+                              options: const MapOptions(
+                                initialCenter: LatLng(0, 0),
+                                initialZoom: 15,
                               ),
+                              mapController: Get.find<AttendanceController>()
+                                  .mapController,
+                              children: [
+                                TileLayer(
+                                  urlTemplate:
+                                      'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                  userAgentPackageName:
+                                      'com.nuvie.employeeassist',
+                                ),
+                              ],
                             );
                           } else {
                             return const Center(
@@ -301,5 +280,19 @@ class Attendance extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return getAsScaffold
+        ? Scaffold(
+            appBar: AppBar(
+              title: const Text(
+                'Attendance',
+              ),
+            ),
+            body: getAttendanceWidget(context),
+          )
+        : getAttendanceWidget(context);
   }
 }

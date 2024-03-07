@@ -28,11 +28,6 @@ class DashboardController extends GetxController {
       case 3:
         appBarColor.value = const Color.fromARGB(91, 255, 255, 255);
         iconColor.value = Colors.black;
-        title.value = "Payments";
-        break;
-      case 4:
-        appBarColor.value = const Color.fromARGB(91, 255, 255, 255);
-        iconColor.value = Colors.black;
         title.value = "Admin Controls";
         break;
       default:

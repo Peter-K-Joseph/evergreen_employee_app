@@ -4,7 +4,6 @@ import 'package:evergreen_employee_app/mischelaneous/database.dart';
 import 'package:evergreen_employee_app/model/http_requests_model.dart';
 import 'package:evergreen_employee_app/model/login.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
@@ -249,6 +248,24 @@ class HttpRequests {
   Future<HTTPResponseBody> getUsers() async {
     http.Response res = await http.get(
       Uri.parse('${Constants().backendUrl}/apis/employee'),
+      headers: headers,
+    );
+    return HTTPResponseBody.import(res);
+  }
+
+  Future<HTTPResponseBody> getRecentEmployeeAttendanceRecords() async {
+    http.Response res = await http.get(
+      Uri.parse('${Constants().backendUrl}/api/attendance/admin/recents'),
+      headers: headers,
+    );
+    return HTTPResponseBody.import(res);
+  }
+
+  Future<HTTPResponseBody> getEmployeeAttendanceRecords(
+      String employeeID) async {
+    http.Response res = await http.get(
+      Uri.parse(
+          '${Constants().backendUrl}/api/reports/performance/$employeeID'),
       headers: headers,
     );
     return HTTPResponseBody.import(res);

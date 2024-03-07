@@ -47,6 +47,8 @@ dependencies:
   lottie: ^2.7.0
   image_picker: ^1.0.5
   flutter_map: ^6.1.0
+  graphic: ^2.2.1
+  fl_chart: ^0.66.2
 
 dev_dependencies:
   flutter_test:

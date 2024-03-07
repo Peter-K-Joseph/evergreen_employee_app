@@ -14,6 +14,7 @@ import 'package:latlong2/latlong.dart';
 
 class AttendanceController extends GetxController {
   AttendanceHandlers handlers = AttendanceHandlers();
+  MapController mapController = MapController();
   RxList<double> currentLocation = [
     0.0,
     0.0,
@@ -316,21 +317,21 @@ class AttendanceController extends GetxController {
     if (!hasPermission) return false;
     location.value = 'We are getting your location details...';
     Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.medium);
+      desiredAccuracy: LocationAccuracy.high,
+    );
 
     currentLocation.value = [position.latitude, position.longitude];
-    // try {
     if (pos == position) false;
-    // if (mapTileLayerController != null) {
-    //   mapTileLayerController.pixelToLatLng(
-    //     Offset(
-    //       Get.width / 2,
-    //       Get.height / 2,
-    //     ),
-    //   );
-    //   mapTileLayerController.insertMarker(0);
+    try {
+      mapController.move(LatLng(position.latitude, position.longitude), 15);
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Could not move the map to your location',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
     pos = position;
-    // }
     return updateLocationString(position.latitude, position.longitude);
   }
 
@@ -341,7 +342,7 @@ class AttendanceController extends GetxController {
     super.onInit();
     getAttendance();
     getCurrentPosition();
-    timer = Timer.periodic(const Duration(seconds: 30), (timer) {
+    timer = Timer.periodic(const Duration(minutes: 1), (timer) {
       getCurrentPosition();
     });
   }
@@ -385,27 +386,24 @@ class AttendanceHandlers {
               SizedBox(
                 width: MediaQuery.of(context).size.width,
                 height: 150,
-                child: SfMaps(
-                  layers: [
-                    MapTileLayer(
-                        initialLatLngBounds: MapLatLngBounds(
-                          MapLatLng(pos.latitude, pos.longitude),
-                          MapLatLng(pos.latitude, pos.longitude),
+                child: FlutterMap(
+                  options: MapOptions(
+                    initialCenter: LatLng(pos.latitude, pos.longitude),
+                    initialZoom: 15,
+                  ),
+                  children: [
+                    TileLayer(
+                      urlTemplate:
+                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      userAgentPackageName: 'com.nuvie.employeeassist',
+                    ),
+                    const RichAttributionWidget(
+                      attributions: [
+                        TextSourceAttribution(
+                          '© OpenStreetMap contributors, CC-BY-SA',
                         ),
-                        markerBuilder: (context, index) {
-                          return MapMarker(
-                            latitude: pos.latitude,
-                            longitude: pos.longitude,
-                            child: const Icon(
-                              Icons.location_on,
-                              color: Colors.red,
-                            ),
-                          );
-                        },
-                        initialZoomLevel: 15,
-                        initialFocalLatLng: const MapLatLng(0, 0),
-                        urlTemplate:
-                            'https://tile.openstreetmap.org/{z}/{x}/{y}.png'),
+                      ],
+                    )
                   ],
                 ),
               ),
@@ -512,27 +510,24 @@ class AttendanceHandlers {
               SizedBox(
                 width: MediaQuery.of(context).size.width,
                 height: 150,
-                child: SfMaps(
-                  layers: [
-                    MapTileLayer(
-                        initialLatLngBounds: MapLatLngBounds(
-                          MapLatLng(pos.latitude, pos.longitude),
-                          MapLatLng(pos.latitude, pos.longitude),
+                child: FlutterMap(
+                  options: MapOptions(
+                    initialCenter: LatLng(pos.latitude, pos.longitude),
+                    initialZoom: 15,
+                  ),
+                  children: [
+                    TileLayer(
+                      urlTemplate:
+                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      userAgentPackageName: 'com.nuvie.employeeassist',
+                    ),
+                    const RichAttributionWidget(
+                      attributions: [
+                        TextSourceAttribution(
+                          '© OpenStreetMap contributors, CC-BY-SA',
                         ),
-                        markerBuilder: (context, index) {
-                          return MapMarker(
-                            latitude: pos.latitude,
-                            longitude: pos.longitude,
-                            child: const Icon(
-                              Icons.location_on,
-                              color: Colors.red,
-                            ),
-                          );
-                        },
-                        initialZoomLevel: 15,
-                        initialFocalLatLng: const MapLatLng(0, 0),
-                        urlTemplate:
-                            'https://tile.openstreetmap.org/{z}/{x}/{y}.png'),
+                      ],
+                    )
                   ],
                 ),
               ),

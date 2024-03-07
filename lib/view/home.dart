@@ -170,7 +170,7 @@ class Home extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        "Salary Payments",
+                        "Active Employees",
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -189,7 +189,7 @@ class Home extends StatelessWidget {
                 const Column(
                   children: [
                     Text(
-                      "We aren't here yet... \nSalary Payments will be available on a later release",
+                      "Response Code: 403: You do not have the necessary permission to access this resource",
                       textAlign: TextAlign.center,
                     )
                   ],

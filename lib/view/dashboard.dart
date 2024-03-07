@@ -153,9 +153,6 @@ class Dashboard extends StatelessWidget {
               ContactDirectory(
                 parentController: Get.find<DashboardController>(),
               ),
-              Home(
-                parentController: Get.find<DashboardController>(),
-              ),
               AdminControls(
                 parentController: Get.find<DashboardController>(),
               ),

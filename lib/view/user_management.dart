@@ -1,3 +1,4 @@
+import 'package:evergreen_employee_app/controller/user_management.dart';
 import 'package:evergreen_employee_app/mischelaneous/http_requests.dart';
 import 'package:evergreen_employee_app/mischelaneous/overlays.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,9 @@ class UserManagement extends StatelessWidget {
             onPressed: () {
               Get.to(
                 () => const NewUserCreation(),
+                binding: BindingsBuilder(() {
+                  Get.put(UserCreationController());
+                }),
                 transition: Transition.downToUp,
               );
             },
@@ -186,19 +190,51 @@ class NewUserCreation extends StatelessWidget {
                 const SizedBox(
                   height: 20,
                 ),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Department',
-                  ),
+                FutureBuilder(
+                  future: Get.find<UserCreationController>().getDepartments(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return DropdownButtonFormField(
+                        items: snapshot.data!
+                            .map<DropdownMenuItem<Map>>((department) {
+                          return DropdownMenuItem(
+                            value: department,
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.business_outlined,
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                Text(
+                                  department['name'],
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (value) {},
+                        decoration: decorationReturner(
+                          'Finance',
+                          'Department',
+                          Icons.business_outlined,
+                        ),
+                      );
+                    } else {
+                      return const CircularProgressIndicator();
+                    }
+                  },
                 ),
                 const SizedBox(
                   height: 20,
                 ),
                 TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Designation',
-                  ),
-                ),
+                    decoration: decorationReturner(
+                  'IT Support Engineer',
+                  'Designation',
+                  Icons.work_outline,
+                )),
                 const SizedBox(
                   height: 20,
                 ),

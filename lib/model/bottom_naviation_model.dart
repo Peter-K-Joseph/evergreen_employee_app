@@ -19,10 +19,6 @@ class BottomNavigationModel {
         label: "People",
       ),
       BottomNavigationBarItem(
-        icon: Icon(Icons.payment_outlined),
-        label: "Payments",
-      ),
-      BottomNavigationBarItem(
         icon: Icon(Icons.admin_panel_settings_outlined),
         label: "Admin",
       ),
